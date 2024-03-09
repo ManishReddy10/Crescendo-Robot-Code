@@ -4,14 +4,20 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
+import java.util.Map;
+
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,21 +29,39 @@ public class Arm extends SubsystemBase {
   
   RelativeEncoder leftEncoder = leftArmMotor.getEncoder();
 
-  PIDController armPidController = new PIDController(0.2, 0, 0);
+  PIDController armPidController = new PIDController(0.05, 0.0, 0);
+
+  DigitalInput armLimitSwitch = new DigitalInput(0);
+
+
+  /*Shuffleboard Initializations */
+  private ShuffleboardTab tab = Shuffleboard.getTab("Arm Setpoints Degrees");
+
+  private GenericEntry inputAmpSetpoint = tab.add("Amp Setpoint", 20).
+      withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 100))
+      .withSize(4, 1).getEntry();
+
+  private GenericEntry encoderDegreesReadout =
+      tab.add("Encoder Degrees Readout", 0)
+         .getEntry();
+
 
   /** Creates a new Arm. */
   public Arm() {
-    rightArmMotor.follow(leftArmMotor, true);
+    rightArmMotor.follow(leftArmMotor, false);
     leftArmMotor.setIdleMode(IdleMode.kBrake);
     rightArmMotor.setIdleMode(IdleMode.kBrake);
     armPidController.setSetpoint(0);
+    leftEncoder.setPosition(0);
   }
 
-  public void setAmpPosition(double setpoint) {
-    armPidController.setSetpoint(setpoint);
+
+  public void setArmPosition(double setpoint) {
+
+    armPidController.setSetpoint(-setpoint);  
   }
   
-  
+
   public Command setArmPower(double power){
     return runEnd(
       () -> leftArmMotor.set(power),
@@ -57,6 +81,8 @@ public class Arm extends SubsystemBase {
       
       /*This method will be called once per scheduler run  */
       SmartDashboard.putNumber("arm position", getPositionDegrees());
+      encoderDegreesReadout.setDouble(getPositionDegrees());
+      System.out.println(getPositionDegrees());
 
       /* Limits Arm Maximum Angle, if maximum arm angle is reached will set arm speed to 0 */
       if(getPositionDegrees() >= 80){
@@ -66,6 +92,14 @@ public class Arm extends SubsystemBase {
         leftArmMotor.set(armPidController.calculate(getPositionDegrees()));
       }
 
+      /*Resets neo encoder position to 0 when arm hits limit switch */
+      // if(armLimitSwitch.get()) {
+      //   leftEncoder.setPosition(0);
+      // }
+
+      // if (armLimitSwitch.get()) {
+      //   System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");        
+      // }
 
     }
   }

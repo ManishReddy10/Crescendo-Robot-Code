@@ -8,6 +8,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -23,6 +24,7 @@ public class RobotContainer {
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
+  
   private final CommandXboxController operatorJoystick = new CommandXboxController(1);
   private final CommandXboxController driverJoystick = new CommandXboxController(0); // My joystick
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
@@ -63,8 +65,8 @@ public class RobotContainer {
     driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
     driverJoystick.pov(180).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
 
-    operatorJoystick.a().whileTrue(intake.setIntakePower(0.5));
-    operatorJoystick.b().whileTrue(intake.setIntakePower(-0.5));
+    operatorJoystick.leftBumper().whileTrue(intake.runIntakeUntilBeamBreakCommand());
+    operatorJoystick.rightBumper().whileTrue(intake.setIntakePower(-0.9));
 
     
     operatorJoystick.x().whileTrue(shooter.setShooterPower(0.7));
@@ -74,8 +76,7 @@ public class RobotContainer {
 
 
 
-    // operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setAmpPosition(-45), arm));
-    // operatorJoystick.y().whileTrue(new InstantCommand(()-> arm.setAmpPosition(-20), arm));
+    operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setArmPosition(40), arm)).onFalse(new InstantCommand(()-> arm.setArmPosition(20), arm));
 
     
     /* Bindings for drivetrain characterization */
