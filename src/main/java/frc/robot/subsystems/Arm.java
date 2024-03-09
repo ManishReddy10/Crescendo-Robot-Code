@@ -29,9 +29,11 @@ public class Arm extends SubsystemBase {
   
   RelativeEncoder leftEncoder = leftArmMotor.getEncoder();
 
-  PIDController armPidController = new PIDController(0.05, 0.0, 0);
+  PIDController armPidController = new PIDController(0.01, 0.001, 0);
 
   DigitalInput armLimitSwitch = new DigitalInput(0);
+
+  String setPoint;
 
 
   /*Shuffleboard Initializations */
@@ -42,6 +44,7 @@ public class Arm extends SubsystemBase {
       .withSize(4, 1).getEntry();
 
   private GenericEntry encoderDegreesReadout =
+
       tab.add("Encoder Degrees Readout", 0)
          .getEntry();
 
@@ -59,6 +62,39 @@ public class Arm extends SubsystemBase {
   public void setArmPosition(double setpoint) {
 
     armPidController.setSetpoint(-setpoint);  
+  }
+
+  public void setPickupPosition() {
+    // if (getPositionDegrees() > 0){
+    //   armPidController.setPID(0.01, 0.001, 0.0);
+    // } else {
+    //   armPidController.setPID(0.3, 0.0, 0.0);
+    // }
+    if (setPoint.equals("Transition")) {
+      armPidController.setSetpoint(0);
+    }
+  }
+
+  public void setTransitionalPosition() {
+    // armPidController.setPID(0.1, 0, 0);
+    // if (getPositionDegrees() > 10){
+    //   armPidController.setPID(0.01, 0.001, 0.0);
+    // } else {
+    //   armPidController.setPID(0.3, 0.0, 0.0);
+    // }
+    armPidController.setSetpoint(-10);
+    setPoint = "Transition";
+  }
+  
+  public void setTopPosition() {
+    // if (getPositionDegrees() > 40){
+    //   armPidController.setPID(0.01, 0.001, 0.0);
+    // } else {
+    //   armPidController.setPID(0.3, 0.0, 0.0);
+    // }
+    // armPidController.setPID(0.5, 0, 0);
+    armPidController.setSetpoint(-40);  
+    setPoint = "Top";
   }
   
 
@@ -100,6 +136,8 @@ public class Arm extends SubsystemBase {
       // if (armLimitSwitch.get()) {
       //   System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");        
       // }
+
+      
 
     }
   }

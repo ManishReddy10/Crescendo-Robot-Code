@@ -76,7 +76,11 @@ public class RobotContainer {
 
 
 
-    operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setArmPosition(40), arm)).onFalse(new InstantCommand(()-> arm.setArmPosition(20), arm));
+    // operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setArmPosition(40), arm)).onFalse(new InstantCommand(()-> arm.setArmPosition(20), arm));
+    operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setTopPosition(), arm));
+    operatorJoystick.y().whileTrue(new InstantCommand(()-> arm.setTransitionalPosition(), arm));
+    operatorJoystick.a().whileTrue(new InstantCommand(()-> arm.setPickupPosition(), arm));
+
 
     
     /* Bindings for drivetrain characterization */
