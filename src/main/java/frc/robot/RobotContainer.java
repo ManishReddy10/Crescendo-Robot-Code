@@ -66,24 +66,31 @@ public class RobotContainer {
     driverJoystick.pov(180).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
 
     operatorJoystick.leftBumper().whileTrue(intake.runIntakeUntilBeamBreakCommand());
+    
     operatorJoystick.rightBumper().whileTrue(intake.setIntakePower(-0.9));
+    operatorJoystick.leftTrigger().whileTrue(intake.setIntakePower(0.9));
+
+    operatorJoystick.rightTrigger().whileFalse((new InstantCommand(()-> shooter.setShooterPower(operatorJoystick.getRightTriggerAxis()), shooter)));
+    operatorJoystick.rightTrigger().whileTrue((new InstantCommand(()-> shooter.setShooterPower(operatorJoystick.getRightTriggerAxis()), shooter)));
+    // operatorJoystick.rightTrigger().whileTrue(shooter.setShooterPower(operatorJoystick.getRightTriggerAxis()));
+    
+    // operatorJoystick.x().whileTrue(shooter.setShooterPower(0.7));
+    
+    operatorJoystick.povDown().whileTrue(arm.setArmPower(-0.1));
+    operatorJoystick.povUp().whileTrue(arm.setArmPower(0.1));
 
     
-    operatorJoystick.x().whileTrue(shooter.setShooterPower(0.7));
-    
-    operatorJoystick.povDown().whileTrue(arm.setArmPower(0.1));
-    operatorJoystick.povUp().whileTrue(arm.setArmPower(-0.7));
 
 
 
     // operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setArmPosition(40), arm)).onFalse(new InstantCommand(()-> arm.setArmPosition(20), arm));
     operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setTopPosition(), arm));
-    operatorJoystick.y().whileTrue(new InstantCommand(()-> arm.setTransitionalPosition(), arm));
     operatorJoystick.a().whileTrue(new InstantCommand(()-> arm.setPickupPosition(), arm));
+    
 
 
     
-    /* Bindings for drivetrain characterization */
+    /* Bindings for drivetrain characterization */  
     /* These bindings require multiple buttons pushed to swap between quastatic and dynamic */
     /* Back/Start select dynamic/quasistatic, Y/X select forward/reverse direction */
     // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));

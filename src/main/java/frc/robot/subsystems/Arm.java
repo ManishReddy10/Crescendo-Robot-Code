@@ -10,11 +10,15 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder;
+import frc.robot.subsystems.Intake;
+
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -23,13 +27,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
+
+  // private DutyCycleEncoder armAbsoluteEncoder = new DutyCycl
   
-  CANSparkMax leftArmMotor = new CANSparkMax(24, MotorType.kBrushless);
-  CANSparkMax rightArmMotor = new CANSparkMax(22, MotorType.kBrushless);
+  CANSparkMax leftArmMotor = new CANSparkMax(22, MotorType.kBrushless); // - = up FOR SURE
+  CANSparkMax rightArmMotor = new CANSparkMax(24, MotorType.kBrushless); // + = up PROBABLY
+  
   
   RelativeEncoder leftEncoder = leftArmMotor.getEncoder();
 
-  PIDController armPidController = new PIDController(0.01, 0.001, 0);
+  PIDController armPidController = new PIDController(0.00000001, 0.00, 0.0);
 
   DigitalInput armLimitSwitch = new DigitalInput(0);
 
@@ -38,6 +45,7 @@ public class Arm extends SubsystemBase {
 
   /*Shuffleboard Initializations */
   private ShuffleboardTab tab = Shuffleboard.getTab("Arm Setpoints Degrees");
+
 
   private GenericEntry inputAmpSetpoint = tab.add("Amp Setpoint", 20).
       withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 100))
@@ -51,11 +59,15 @@ public class Arm extends SubsystemBase {
 
   /** Creates a new Arm. */
   public Arm() {
-    rightArmMotor.follow(leftArmMotor, false);
+    rightArmMotor.follow(leftArmMotor, true);
     leftArmMotor.setIdleMode(IdleMode.kBrake);
     rightArmMotor.setIdleMode(IdleMode.kBrake);
     armPidController.setSetpoint(0);
     leftEncoder.setPosition(0);
+  }
+
+  public void moveRightArmUp() {
+    rightArmMotor.set(0.3);
   }
 
 
@@ -64,15 +76,21 @@ public class Arm extends SubsystemBase {
     armPidController.setSetpoint(-setpoint);  
   }
 
+  public void testPID() {
+    
+    
+  }
+
   public void setPickupPosition() {
+    armPidController.setPID(0.01, 0, 0.0);
     // if (getPositionDegrees() > 0){
     //   armPidController.setPID(0.01, 0.001, 0.0);
     // } else {
     //   armPidController.setPID(0.3, 0.0, 0.0);
     // }
-    if (setPoint.equals("Transition")) {
+    // if (setPoint.equals("Transition")) {
       armPidController.setSetpoint(0);
-    }
+    // }
   }
 
   public void setTransitionalPosition() {
@@ -92,9 +110,13 @@ public class Arm extends SubsystemBase {
     // } else {
     //   armPidController.setPID(0.3, 0.0, 0.0);
     // }
-    // armPidController.setPID(0.5, 0, 0);
-    armPidController.setSetpoint(-40);  
-    setPoint = "Top";
+    armPidController.setPID(0.05, 0, 0);
+    armPidController.setSetpoint(60);  
+  }
+
+  public void setFrontSubwooferPosition() {
+    armPidController.setPID(0.05, 0, 0);
+    armPidController.setSetpoint(15);
   }
   
 
@@ -116,17 +138,18 @@ public class Arm extends SubsystemBase {
     public void periodic() {
       
       /*This method will be called once per scheduler run  */
-      SmartDashboard.putNumber("arm position", getPositionDegrees());
+      SmartDashboard.putNumber("arm position relative encoder", getPositionDegrees());
       encoderDegreesReadout.setDouble(getPositionDegrees());
-      System.out.println(getPositionDegrees());
+      System.out.println(Intake.throughBoreEncoder.getPosition()*360);
+
 
       /* Limits Arm Maximum Angle, if maximum arm angle is reached will set arm speed to 0 */
-      if(getPositionDegrees() >= 80){
-        leftArmMotor.set(0);
-      } else {
+      // if(getPositionDegrees() >= 80){
+      //   leftArmMotor.set(0);
+      // } else {
         
-        leftArmMotor.set(armPidController.calculate(getPositionDegrees()));
-      }
+        leftArmMotor.set(armPidController.calculate(Intake.throughBoreEncoder.getPosition()*360));
+      // }
 
       /*Resets neo encoder position to 0 when arm hits limit switch */
       // if(armLimitSwitch.get()) {

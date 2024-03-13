@@ -5,7 +5,10 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.SparkRelativeEncoder.Type;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -13,6 +16,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -20,7 +24,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class Intake extends SubsystemBase {
   XboxController operatorXboxController;
   
-  CANSparkMax intakeSparkMax = new CANSparkMax(21, MotorType.kBrushed);
+  public static CANSparkMax intakeSparkMax = new CANSparkMax(21, MotorType.kBrushed);
+
+  
+
+  public static RelativeEncoder throughBoreEncoder = intakeSparkMax.getEncoder(Type.kQuadrature, 8192);
 
   DigitalInput infaredReflectionBottom = new DigitalInput(2); // The infared sensor closest to ground when arm is fully down
   DigitalInput infaredReflectionTop = new DigitalInput(1); // This one is closer to shooter wheels
@@ -43,6 +51,10 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
+    
+
+    SmartDashboard.putNumber("Through Bore Encoder Readout", throughBoreEncoder.getPosition()*360);
+
     topSensorReadount.setBoolean(infaredReflectionTop.get());
   }
 
@@ -57,11 +69,12 @@ public class Intake extends SubsystemBase {
   }
 
   public Command setIntakePower(double power) {
+    
     return runEnd(
       () -> intakeSparkMax.set(power),
       () -> intakeSparkMax.set(0)
-
     ); 
+
   }
 
     public Command runIntakeUntilBeamBreakCommand() {

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -22,6 +23,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    CameraServer.startAutomaticCapture();
     PortForwarder.add(5800, "photonvision.local", 5800);
     m_robotContainer = new RobotContainer();
 
