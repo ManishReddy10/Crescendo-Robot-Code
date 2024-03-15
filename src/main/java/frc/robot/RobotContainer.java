@@ -12,6 +12,7 @@ import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
@@ -70,8 +71,8 @@ public class RobotContainer {
     operatorJoystick.rightBumper().whileTrue(intake.setIntakePower(-0.9));
     operatorJoystick.leftTrigger().whileTrue(intake.setIntakePower(0.9));
 
-    operatorJoystick.rightTrigger().whileFalse((new InstantCommand(()-> shooter.setShooterPower(operatorJoystick.getRightTriggerAxis()), shooter)));
-    operatorJoystick.rightTrigger().whileTrue((new InstantCommand(()-> shooter.setShooterPower(operatorJoystick.getRightTriggerAxis()), shooter)));
+    operatorJoystick.rightTrigger().whileFalse((new InstantCommand(()-> shooter.setShooterPower(0), shooter)));
+    operatorJoystick.rightTrigger().whileTrue((new InstantCommand(()-> shooter.setShooterPower(operatorJoystick.getRightTriggerAxis()*0.6), shooter)));
     // operatorJoystick.rightTrigger().whileTrue(shooter.setShooterPower(operatorJoystick.getRightTriggerAxis()));
     
     // operatorJoystick.x().whileTrue(shooter.setShooterPower(0.7));
@@ -84,8 +85,11 @@ public class RobotContainer {
 
 
     // operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setArmPosition(40), arm)).onFalse(new InstantCommand(()-> arm.setArmPosition(20), arm));
-    operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setTopPosition(), arm));
+    operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setFrontSubwooferPosition(), arm));
     operatorJoystick.a().whileTrue(new InstantCommand(()-> arm.setPickupPosition(), arm));
+    operatorJoystick.y().whileTrue(new InstantCommand(()-> arm.setTopPosition(), arm));
+    // operatorJoystick.x().onTrue(new InstantCommand(()-> arm.autonArmTopToBottomInitialization(), arm));
+
     
 
 
@@ -107,6 +111,6 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     /* First put the drivetrain into auto run mode, then run the auto */
-    return runAuto;
+    return new SequentialCommandGroup(new InstantCommand(()-> arm.setPickupPosition(), arm), new InstantCommand(()-> arm.setFrontSubwooferPosition(), arm), new InstantCommand(()-> arm.setPickupPosition(), arm));
   }
 }

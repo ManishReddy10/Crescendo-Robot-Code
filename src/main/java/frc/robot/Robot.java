@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,8 +28,8 @@ public class Robot extends TimedRobot {
     CameraServer.startAutomaticCapture();
     PortForwarder.add(5800, "photonvision.local", 5800);
     m_robotContainer = new RobotContainer();
-
     m_robotContainer.drivetrain.getDaqThread().setThreadPriority(99);
+
   }
   @Override
   public void robotPeriodic() {

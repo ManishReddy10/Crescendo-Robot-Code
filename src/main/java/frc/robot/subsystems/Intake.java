@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
@@ -11,6 +12,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkRelativeEncoder.Type;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -25,10 +28,9 @@ public class Intake extends SubsystemBase {
   XboxController operatorXboxController;
   
   public static CANSparkMax intakeSparkMax = new CANSparkMax(21, MotorType.kBrushed);
+  public static SparkAbsoluteEncoder throughBoreEncoder = intakeSparkMax.getAbsoluteEncoder();
 
-  
-
-  public static RelativeEncoder throughBoreEncoder = intakeSparkMax.getEncoder(Type.kQuadrature, 8192);
+  // intakeSparkMax.getEncoder(Type.kQuadrature, 8192);
 
   DigitalInput infaredReflectionBottom = new DigitalInput(2); // The infared sensor closest to ground when arm is fully down
   DigitalInput infaredReflectionTop = new DigitalInput(1); // This one is closer to shooter wheels
@@ -40,16 +42,45 @@ public class Intake extends SubsystemBase {
          .getEntry();
 
 
+         AddressableLED m_led = new AddressableLED(3);
+         AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(60);
 
 
   /** Creates a new Intake. */
   public Intake(CommandXboxController operatorJoystick) {
     this.operatorXboxController = operatorXboxController;
+        // PWM port 9
+    // Must be a PWM header, not MXP or DIO
+
+    // Reuse buffer
+    // Default to a length of 60, start empty output
+    // Length is expensive to set, so only set it once, then just update data
+    m_led.setLength(m_ledBuffer.getLength());
+    
+    m_led.start();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
+    if (infaredReflectionTop.get() == false) {
+      
+    
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      // Sets the specified LED to the RGB values for red
+      m_ledBuffer.setRGB(i, 255, 50, 0);
+   }
+  } else {
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      // Sets the specified LED to the RGB values for red
+      m_ledBuffer.setRGB(i, 0, 0, 100);
+       }
+  }
+    // Set the data
+    m_led.setData(m_ledBuffer);
+
+    SmartDashboard.putBoolean("Infadred", infaredReflectionTop.get());
 
     
 
