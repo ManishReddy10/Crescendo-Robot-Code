@@ -34,8 +34,8 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
   
   
-  
-  Intake intake = new Intake(operatorJoystick);
+
+  Intake intake = new Intake();
   Shooter shooter = new Shooter();
   Arm arm = new Arm();
 
@@ -130,7 +130,15 @@ public class RobotContainer {
     configureBindings();
   }
 
+  public Command oneNoteScoreAtSubwoofer() {
+      return new SequentialCommandGroup(
+      
+      new InstantCommand(()-> arm.autonTopToSubwooferPosition(), arm),
+      new InstantCommand(()-> shooter.setShooterPower(0.6), shooter),
+      new WaitCommand(5),
+      new InstantCommand(()-> intake.autonomousIntakePower(0.7), intake));
 
+  }
 
 
   public Command getAutonomousCommand() {
@@ -151,5 +159,7 @@ public class RobotContainer {
       new InstantCommand(()-> shooter.setShooterPower(0.6), shooter),
       new WaitCommand(5),
       new InstantCommand(()-> intake.autonomousIntakePower(0.7), intake));
+
+    // return runAuto;
   }
 }

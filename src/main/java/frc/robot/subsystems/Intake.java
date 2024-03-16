@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.trobot5013lib.led.TrobotAddressableLED;
 
 public class Intake extends SubsystemBase {
-  XboxController operatorXboxController;
   
   public static CANSparkMax intakeSparkMax = new CANSparkMax(21, MotorType.kBrushed);
   public static SparkAbsoluteEncoder throughBoreEncoder = intakeSparkMax.getAbsoluteEncoder();
@@ -49,8 +48,7 @@ public class Intake extends SubsystemBase {
 
 
   /** Creates a new Intake. */
-  public Intake(CommandXboxController operatorJoystick) {
-    this.operatorXboxController = operatorXboxController;
+  public Intake() {
     intakeSparkMax.setSmartCurrentLimit(30);
         // PWM port 9
     // Must be a PWM header, not MXP or DIO

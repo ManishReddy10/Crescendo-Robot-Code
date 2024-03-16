@@ -69,6 +69,9 @@ public class Arm extends SubsystemBase {
 
   /** Creates a new Arm. */
   public Arm() {
+    rightArmMotor.setSmartCurrentLimit(30);
+    leftArmMotor.setSmartCurrentLimit(30);
+
     rightArmMotor.follow(leftArmMotor, true);
     leftArmMotor.setIdleMode(IdleMode.kBrake);
     rightArmMotor.setIdleMode(IdleMode.kBrake);
