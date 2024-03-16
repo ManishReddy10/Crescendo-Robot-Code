@@ -17,6 +17,8 @@ public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
   public Shooter() {
     lowShooterMotor.follow(topShooterMotor, false);
+    lowShooterMotor.setSmartCurrentLimit(30);
+    topShooterMotor.setSmartCurrentLimit(30);
   }
 
   // public Command setShooterPower(double power) {
@@ -25,10 +27,11 @@ public class Shooter extends SubsystemBase {
   //         () -> topShooterMotor.set(0)
   //       );   }
 
-      public void setShooterPower(double power) {
-          topShooterMotor.set(power);
-          
+  public void setShooterPower(double power) {
+    topShooterMotor.set(power);      
    }
+
+   
 
   @Override
   public void periodic() {

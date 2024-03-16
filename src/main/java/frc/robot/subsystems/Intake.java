@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.trobot5013lib.led.TrobotAddressableLED;
 
 public class Intake extends SubsystemBase {
   XboxController operatorXboxController;
@@ -42,20 +43,22 @@ public class Intake extends SubsystemBase {
          .getEntry();
 
 
-         AddressableLED m_led = new AddressableLED(3);
-         AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(60);
+  AddressableLED m_led = new AddressableLED(3);
+  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(60);
+  // TrobotAddressableLED m_led = new TrobotAddressableLED(3, 0);
 
 
   /** Creates a new Intake. */
   public Intake(CommandXboxController operatorJoystick) {
     this.operatorXboxController = operatorXboxController;
+    intakeSparkMax.setSmartCurrentLimit(30);
         // PWM port 9
     // Must be a PWM header, not MXP or DIO
 
     // Reuse buffer
     // Default to a length of 60, start empty output
     // Length is expensive to set, so only set it once, then just update data
-    m_led.setLength(m_ledBuffer.getLength());
+    m_led.setLength(m_ledBuffer.getLength()); // length is 60
     
     m_led.start();
   }
@@ -63,6 +66,8 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
+    // System.out.println("LED LENGTH: " + m_ledBuffer.getLength());
 
     if (infaredReflectionTop.get() == false) {
       
@@ -106,6 +111,10 @@ public class Intake extends SubsystemBase {
       () -> intakeSparkMax.set(0)
     ); 
 
+  }
+
+  public void autonomousIntakePower(double power) {
+    intakeSparkMax.set(power);
   }
 
     public Command runIntakeUntilBeamBreakCommand() {

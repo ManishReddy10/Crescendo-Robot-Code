@@ -46,7 +46,7 @@ public class Arm extends SubsystemBase {
 
   PIDController armPidController = new PIDController(0.00000001, 0.00, 0.0);
 
-  DigitalInput armLimitSwitch = new DigitalInput(0);
+  // DigitalInput armLimitSwitch = new DigitalInput(0);
 
   String setPoint;
 
@@ -94,14 +94,14 @@ public class Arm extends SubsystemBase {
   }
 
   public void setPickupPosition() {
-    armPidController.setPID(0.0025, 0, 0.0);
+    armPidController.setPID(0.0055, 0, 0.0);
     // if (getPositionDegrees() > 0){
     //   armPidController.setPID(0.01, 0.001, 0.0);
     // } else {
     //   armPidController.setPID(0.3, 0.0, 0.0);
     // }
     // if (setPoint.equals("Transition")) {
-      armPidController.setSetpoint(5);
+      armPidController.setSetpoint(2);
       pos = 1;
     // }
   }
@@ -124,24 +124,31 @@ public class Arm extends SubsystemBase {
     //   armPidController.setPID(0.3, 0.0, 0.0);
     // }
       armPidController.setPID(0.007, 0, 0);
-            System.out.println("going up to top");
+            // System.out.println("going up to top");
     
-    armPidController.setSetpoint(75);  
+    armPidController.setSetpoint(84);  
     pos = 3;
   }
 
   public void setFrontSubwooferPosition() {
     if (pos == 3) {
       armPidController.setPID(0.006, 0, 0);
-      System.out.println("going down to subwoofer");
+      // System.out.println("going down to subwoofer");
     } else {
       armPidController.setPID(0.04, 0, 0);
-      System.out.println("going up to subwoofer");
+      // System.out.println("going up to subwoofer");
     }
     armPidController.setSetpoint(15);
     pos = 2;
     
   }
+
+  public void autonTopToSubwooferPosition() {
+      armPidController.setPID(0.006, 0, 0);
+      armPidController.setSetpoint(15);
+      // System.out.println("going down to subwoofer");
+  
+    }
   
   // public void autonArmTopToBottomInitialization() {
   //   while (armLimitSwitch.get() == true) {
@@ -176,7 +183,7 @@ public class Arm extends SubsystemBase {
       SmartDashboard.putNumber("arm position relative encoder", getPositionDegrees());
       encoderDegreesReadout.setDouble(getPositionDegrees());
 
-      System.out.println(Intake.throughBoreEncoder.getPosition()*360);
+      // System.out.println(Intake.throughBoreEncoder.getPosition()*360);
       // System.out.println(Intake.throughBoreEncoder.getPosition());
 
 
@@ -190,8 +197,8 @@ public class Arm extends SubsystemBase {
 
       /*Resets neo encoder position to 0 when arm hits limit switch */
 
-      if (armLimitSwitch.get() == false) {
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");        
-      }
+      // if (armLimitSwitch.get() == false) {
+      //   System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");        
+      // }
     }
   }

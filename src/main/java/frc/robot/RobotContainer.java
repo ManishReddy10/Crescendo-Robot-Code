@@ -11,8 +11,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
@@ -29,6 +32,9 @@ public class RobotContainer {
   private final CommandXboxController operatorJoystick = new CommandXboxController(1);
   private final CommandXboxController driverJoystick = new CommandXboxController(0); // My joystick
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  
+  
+  
   Intake intake = new Intake(operatorJoystick);
   Shooter shooter = new Shooter();
   Arm arm = new Arm();
@@ -46,25 +52,28 @@ public class RobotContainer {
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
+  
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(() -> drive.withVelocityX(-driverJoystick.getLeftY() * MaxSpeed) // Drive forward with
+        drivetrain.applyRequest(() -> drive.withVelocityX(driverJoystick.getLeftY() * MaxSpeed) // Drive forward with
                                                                                            // negative Y (forward)
-            .withVelocityY(-driverJoystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+            .withVelocityY(driverJoystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
             .withRotationalRate(-driverJoystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
         ).ignoringDisable(true));
 
-    driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    driverJoystick.b().whileTrue(drivetrain
-        .applyRequest(() -> point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))));
+
+
+    // driverJoystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+    // driverJoystick.b().whileTrue(drivetrain
+    //     .applyRequest(() -> point.withModuleDirection(new Rotation2d(-driverJoystick.getLeftY(), -driverJoystick.getLeftX()))));
 
     // reset the field-centric heading on left bumper press
     driverJoystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
-    driverJoystick.pov(180).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
+    // driverJoystick.pov(0).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
+    // driverJoystick.pov(180).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
 
     operatorJoystick.leftBumper().whileTrue(intake.runIntakeUntilBeamBreakCommand());
     
@@ -72,7 +81,7 @@ public class RobotContainer {
     operatorJoystick.leftTrigger().whileTrue(intake.setIntakePower(0.9));
 
     operatorJoystick.rightTrigger().whileFalse((new InstantCommand(()-> shooter.setShooterPower(0), shooter)));
-    operatorJoystick.rightTrigger().whileTrue((new InstantCommand(()-> shooter.setShooterPower(operatorJoystick.getRightTriggerAxis()*0.6), shooter)));
+    operatorJoystick.rightTrigger().whileTrue((new InstantCommand(()-> shooter.setShooterPower(operatorJoystick.getRightTriggerAxis()), shooter)));
     // operatorJoystick.rightTrigger().whileTrue(shooter.setShooterPower(operatorJoystick.getRightTriggerAxis()));
     
     // operatorJoystick.x().whileTrue(shooter.setShooterPower(0.7));
@@ -88,6 +97,7 @@ public class RobotContainer {
     operatorJoystick.b().whileTrue(new InstantCommand(()-> arm.setFrontSubwooferPosition(), arm));
     operatorJoystick.a().whileTrue(new InstantCommand(()-> arm.setPickupPosition(), arm));
     operatorJoystick.y().whileTrue(new InstantCommand(()-> arm.setTopPosition(), arm));
+    // operatorJoystick.x().whileTrue(new InstantCommand(()-> arm.autonTopToSubwooferPosition(), arm));
     // operatorJoystick.x().onTrue(new InstantCommand(()-> arm.autonArmTopToBottomInitialization(), arm));
 
     
@@ -106,11 +116,40 @@ public class RobotContainer {
 
 
   public RobotContainer() {
+    drivetrain.getModule(0).getDriveMotor().getConfigurator().refresh(TunerConstants.driverRamp);
+    drivetrain.getModule(0).getSteerMotor().getConfigurator().refresh(TunerConstants.steerRamp);
+    drivetrain.getModule(1).getDriveMotor().getConfigurator().refresh(TunerConstants.driverRamp);
+    drivetrain.getModule(1).getSteerMotor().getConfigurator().refresh(TunerConstants.steerRamp);
+    drivetrain.getModule(2).getDriveMotor().getConfigurator().refresh(TunerConstants.driverRamp);
+    drivetrain.getModule(2).getSteerMotor().getConfigurator().refresh(TunerConstants.steerRamp);
+    drivetrain.getModule(3).getDriveMotor().getConfigurator().refresh(TunerConstants.driverRamp);
+    drivetrain.getModule(3).getSteerMotor().getConfigurator().refresh(TunerConstants.steerRamp);
+
+    
+
     configureBindings();
   }
 
+
+
+
   public Command getAutonomousCommand() {
     /* First put the drivetrain into auto run mode, then run the auto */
-    return new SequentialCommandGroup(new InstantCommand(()-> arm.setPickupPosition(), arm), new InstantCommand(()-> arm.setFrontSubwooferPosition(), arm), new InstantCommand(()-> arm.setPickupPosition(), arm));
+    // return new SequentialCommandGroup(
+      
+    //   new InstantCommand(()-> arm.autonTopToSubwooferPosition(), arm),
+    //   new ParallelCommandGroup(
+    //     new InstantCommand(()-> shooter.setShooterPower(0.5)),
+    //     // new SequentialCommandGroup(new InstantCommand (()-> intake.setIntakePower(0.7)))),
+    //     new InstantCommand (()-> intake.setIntakePower(0.7))),
+    //   new InstantCommand(()-> arm.setPickupPosition(), arm));
+  
+  
+  return new SequentialCommandGroup(
+      
+      new InstantCommand(()-> arm.autonTopToSubwooferPosition(), arm),
+      new InstantCommand(()-> shooter.setShooterPower(0.6), shooter),
+      new WaitCommand(5),
+      new InstantCommand(()-> intake.autonomousIntakePower(0.7), intake));
   }
 }
