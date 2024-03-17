@@ -4,8 +4,8 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,13 +17,21 @@ public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
   public Shooter() {
     lowShooterMotor.follow(topShooterMotor, false);
+    lowShooterMotor.setSmartCurrentLimit(30);
+    topShooterMotor.setSmartCurrentLimit(30);
   }
 
-  public Command setShooterPower(double power) {
-    return runEnd(
-          () -> topShooterMotor.set(power),
-          () -> topShooterMotor.set(0)
-        );   }
+  // public Command setShooterPower(double power) {
+  //   return runEnd(
+  //         () -> topShooterMotor.set(power),
+  //         () -> topShooterMotor.set(0)
+  //       );   }
+
+  public void setShooterPower(double power) {
+    topShooterMotor.set(power);      
+   }
+
+   
 
   @Override
   public void periodic() {
