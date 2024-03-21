@@ -22,16 +22,18 @@ public class Robot extends TimedRobot {
 
   private final boolean UseLimelight = false;
 
-  PhotonCamera camera = new PhotonCamera("Microsoft_LifeCam_HD-3000 (1)");
+  PhotonCamera noteCam = new PhotonCamera("Microsoft_LifeCam_HD-3000 (1)");
+  PhotonCamera aprilCam = new PhotonCamera("USB_Camera");
 
   @Override
   public void robotInit() {
     // Setup cameras
     CameraServer.startAutomaticCapture();
     PortForwarder.add(5800, "photonvision.local", 5800);
-    camera.setDriverMode(true);
-    camera.setPipelineIndex(1); // Note pipeline
-    double latencySeconds = result.getLatencyMillis() / 1000.0;
+    noteCam.setDriverMode(true);
+    noteCam.setPipelineIndex(1); // Note pipeline
+    aprilCam.setDriverMode(false);
+    aprilCam.setPipelineIndex(1); // AprilTag pipeline
     // print out latency seconds ?
     
     m_robotContainer = new RobotContainer();
