@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
     noteCam.setDriverMode(true);
     noteCam.setPipelineIndex(1); // Note pipeline
     aprilCam.setDriverMode(false);
-    aprilCam.setPipelineIndex(1); // AprilTag pipeline
+    aprilCam.setPipelineIndex(2); // AprilTag pipeline
     // print out latency seconds ?
     
     m_robotContainer = new RobotContainer();
