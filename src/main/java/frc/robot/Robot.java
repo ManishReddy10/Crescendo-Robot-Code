@@ -21,7 +21,7 @@ public class Robot extends TimedRobot {
 
   private final boolean UseLimelight = false;
 
-  
+  PhotonCamera camera = new PhotonCamera("photonvision");
 
   @Override
   public void robotInit() {
