@@ -25,8 +25,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    // Setup cameras
     CameraServer.startAutomaticCapture();
-    //PortForwarder.add(5800, "photonvision.local", 5800);
+    PortForwarder.add(5800, "photonvision.local", 5800);
+    camera.setDriverMode(true);
+    camera.setPipelineIndex(1); // Note pipeline
+    double latencySeconds = result.getLatencyMillis() / 1000.0;
+    // print out latency seconds ?
+    
     m_robotContainer = new RobotContainer();
     m_robotContainer.drivetrain.getDaqThread().setThreadPriority(99);
 
