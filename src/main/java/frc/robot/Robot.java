@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.photonvision.PhotonCamera;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -21,12 +22,20 @@ public class Robot extends TimedRobot {
 
   private final boolean UseLimelight = false;
 
-  
+  PhotonCamera noteCam = new PhotonCamera("Microsoft_LifeCam_HD-3000 (1)");
+  PhotonCamera aprilCam = new PhotonCamera("USB_Camera");
 
   @Override
   public void robotInit() {
+    // Setup cameras
     CameraServer.startAutomaticCapture();
-    //PortForwarder.add(5800, "photonvision.local", 5800);
+    PortForwarder.add(5800, "photonvision.local", 5800);
+    noteCam.setDriverMode(true);
+    noteCam.setPipelineIndex(1); // Note pipeline
+    aprilCam.setDriverMode(false);
+    aprilCam.setPipelineIndex(2); // AprilTag pipeline
+    // print out latency seconds ?
+    
     m_robotContainer = new RobotContainer();
     m_robotContainer.drivetrain.getDaqThread().setThreadPriority(99);
 
