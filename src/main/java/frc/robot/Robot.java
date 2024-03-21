@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
 
   private final boolean UseLimelight = false;
 
-  PhotonCamera camera = new PhotonCamera("photonvision");
+  PhotonCamera camera = new PhotonCamera("Microsoft_LifeCam_HD-3000 (1)");
 
   @Override
   public void robotInit() {
